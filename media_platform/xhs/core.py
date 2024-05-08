@@ -79,22 +79,74 @@ class XiaoHongShuCrawler(AbstractCrawler):
                 )
                 await login_obj.begin()
                 await self.xhs_client.update_cookies(browser_context=self.browser_context)
+            #点赞
+            if config.OP == "zan":
+                await self.dianzan()
+                utils.logger.info("小红书 点赞结束 ...")
+            #爬虫
+            elif config.OP == "crawler":
+                crawler_type_var.set(self.crawler_type)
+                if self.crawler_type == "search":
+                    # Search for notes and retrieve their comment information.
+                    await self.search()
+                elif self.crawler_type == "detail":
+                    # Get the information and comments of the specified post
+                    await self.get_specified_notes()
+                elif self.crawler_type == "creator":
+                    # Get creator's information and their notes and comments
+                    await self.get_creators_and_notes()
+                else:
+                    pass
+                utils.logger.info("[XiaoHongShuCrawler.start] Xhs Crawler finished ...")
+            #评论
+            elif config.OP == "pinglun":
+                crawler_type_var.set(self.crawler_type)
+                if self.crawler_type == "search":
+                    # Search for notes and retrieve their comment information.
+                    await self.search()
+                elif self.crawler_type == "detail":
+                    # Get the information and comments of the specified post
+                    await self.get_specified_notes()
+                elif self.crawler_type == "creator":
+                    # Get creator's information and their notes and comments
+                    await self.get_creators_and_notes()
+                else:
+                    pass
+                utils.logger.info("[XiaoHongShuCrawler.start] Xhs Crawler finished ...")
+            #先点赞后评论
+            elif config.OP == "dianping":
+                crawler_type_var.set(self.crawler_type)
+                if self.crawler_type == "search":
+                    # Search for notes and retrieve their comment information.
+                    await self.search()
+                elif self.crawler_type == "detail":
+                    # Get the information and comments of the specified post
+                    await self.get_specified_notes()
+                elif self.crawler_type == "creator":
+                    # Get creator's information and their notes and comments
+                    await self.get_creators_and_notes()
+                else:
+                    pass
+                utils.logger.info("[XiaoHongShuCrawler.start] Xhs Crawler finished ...")
+    async def dianzan(self) -> None:
+        """Get creator's notes and retrieve their comment information."""
+        utils.logger.info("开始点赞...")
+        for note_id in config.XHS_ZAN_SPECIFIED_ID_LIST:
+            utils.logger.info(note_id)
+            # get creator detail info from web html content
+            # createor_info: Dict = await self.xhs_client.get_creator_info(user_id=user_id)
+            # if createor_info:
+            #     await xhs_store.save_creator(user_id, creator=createor_info)
 
-            crawler_type_var.set(self.crawler_type)
-            if self.crawler_type == "search":
-                # Search for notes and retrieve their comment information.
-                await self.search()
-            elif self.crawler_type == "detail":
-                # Get the information and comments of the specified post
-                await self.get_specified_notes()
-            elif self.crawler_type == "creator":
-                # Get creator's information and their notes and comments
-                await self.get_creators_and_notes()
-            else:
-                pass
+            # # Get all note information of the creator
+            # all_notes_list = await self.xhs_client.get_all_notes_by_creator(
+            #     user_id=user_id,
+            #     crawl_interval=random.random(),
+            #     callback=self.fetch_creator_notes_detail
+            # )
 
-            utils.logger.info("[XiaoHongShuCrawler.start] Xhs Crawler finished ...")
-
+            # note_ids = [note_item.get("note_id") for note_item in all_notes_list]
+            # await self.batch_get_note_comments(note_ids)            
     async def search(self) -> None:
         """Search for notes and retrieve their comment information."""
         utils.logger.info("[XiaoHongShuCrawler.search] Begin search xiaohongshu keywords")
@@ -286,3 +338,15 @@ class XiaoHongShuCrawler(AbstractCrawler):
         """Close browser context"""
         await self.browser_context.close()
         utils.logger.info("[XiaoHongShuCrawler.close] Browser context closed ...")
+
+    async def dianzan(self):
+        """指定ID点赞"""
+        semaphore = asyncio.Semaphore(config.MAX_CONCURRENCY_NUM)
+        task_list = [
+            self.get_note_detail(note_id=note_id, semaphore=semaphore) for note_id in config.XHS_ZAN_SPECIFIED_ID_LIST
+        ]
+        note_details = await asyncio.gather(*task_list)
+        for note_detail in note_details:
+            if note_detail is not None:
+                print(note_detail)
+        # await self.batch_get_note_comments(config.XHS_ZAN_SPECIFIED_ID_LIST)
