@@ -17,7 +17,7 @@ IP_PROXY_POOL_COUNT = 2
 IP_PROXY_PROVIDER_NAME = "kuaidaili"
 
 # 设置为True不会打开浏览器（无头浏览器），设置False会打开一个浏览器（小红书如果一直扫码登录不通过，打开浏览器手动过一下滑动验证码）
-HEADLESS = False
+HEADLESS = True
 
 # 是否保存登录状态
 SAVE_LOGIN_STATE = True
@@ -57,9 +57,15 @@ XHS_SPECIFIED_ID_LIST = [
 
 # 指定小红书需要点赞的笔记ID列表
 XHS_ZAN_SPECIFIED_ID_LIST = [
+<<<<<<< HEAD
     "662c5cac0000000004018705",
     "6635a0b2000000001e038b41",
     "662da624000000001c008e22",
+=======
+    "6422c2750000000027000d88",
+    "64ca1b73000000000b028dd2",
+    "630d5b85000000001203ab41",
+>>>>>>> 1b7e15fcc2c6ddbbffc0f148a8880c37c1159395
     # ........................
 ]
 
