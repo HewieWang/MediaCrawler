@@ -81,7 +81,14 @@ class XiaoHongShuCrawler(AbstractCrawler):
                 await self.xhs_client.update_cookies(browser_context=self.browser_context)
             #点赞
             if config.OP == "zan":
-                await self.dianzan()
+                # await self.dianzan()
+                utils.logger.info("开始点赞...")
+                for note_id in config.XHS_ZAN_SPECIFIED_ID_LIST:
+                    utils.logger.info(note_id)
+                    #https://www.xiaohongshu.com/explore/6623309c0000000001007f30
+                    await self.context_page.goto("https://www.xiaohongshu.com/explore/"+note_id)
+                    #点击like-lottie
+                    await self.context_page.locator('#noteContainer .engage-bar .like-wrapper .like-lottie').click()
                 utils.logger.info("小红书 点赞结束 ...")
             #爬虫
             elif config.OP == "crawler":
@@ -100,19 +107,13 @@ class XiaoHongShuCrawler(AbstractCrawler):
                 utils.logger.info("[XiaoHongShuCrawler.start] Xhs Crawler finished ...")
             #评论
             elif config.OP == "pinglun":
-                crawler_type_var.set(self.crawler_type)
-                if self.crawler_type == "search":
-                    # Search for notes and retrieve their comment information.
-                    await self.search()
-                elif self.crawler_type == "detail":
-                    # Get the information and comments of the specified post
-                    await self.get_specified_notes()
-                elif self.crawler_type == "creator":
-                    # Get creator's information and their notes and comments
-                    await self.get_creators_and_notes()
-                else:
-                    pass
-                utils.logger.info("[XiaoHongShuCrawler.start] Xhs Crawler finished ...")
+                utils.logger.info("开始评论...")
+                for note_id in config.XHS_ZAN_SPECIFIED_ID_LIST:
+                    utils.logger.info(note_id)
+                    await self.context_page.locator('.content-edit .inner span').click()
+                    await self.context_page.fill("id=content-textarea", "666")
+                    await self.context_page.locator('.engage-bar-container .btn.submit').click()
+                utils.logger.info("小红书 评论结束 ...")
             #先点赞后评论
             elif config.OP == "dianping":
                 crawler_type_var.set(self.crawler_type)

@@ -42,6 +42,8 @@ async def main():
                          default=config.START_PAGE)
     parser.add_argument('--keywords', type=str, help='crawler type (please input keywords)',
                          default=config.KEYWORDS)
+    parser.add_argument('--op', type=str, help='点赞',
+                         default=config.OP)
     
     # init db
     if config.SAVE_DATA_OPTION == "db":
@@ -56,6 +58,8 @@ async def main():
         start_page=args.start,
         keyword=args.keywords
     )
+
+    
     await crawler.start()
     
     if config.SAVE_DATA_OPTION == "db":
