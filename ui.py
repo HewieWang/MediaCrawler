@@ -1,9 +1,3 @@
-"""
-本代码由[Tkinter布局助手]生成
-官网:https://www.pytk.net
-QQ交流群:905019785
-在线反馈:https://support.qq.com/product/618914
-"""
 import random
 from tkinter import *
 from tkinter.ttk import *
@@ -194,6 +188,7 @@ class Win(WinGUI):
         self.__event_bind()
         self.__style_config()
         self.ctl.init(self)
+
     def __event_bind(self):
         self.tk_button_lwemvqoh.bind('<Button-1>',self.ctl.addaccount)
         self.tk_button_lwemwxje.bind('<Button-1>',self.ctl.jiance)
@@ -206,30 +201,46 @@ class Win(WinGUI):
 
     def __style_config(self):
         pass
-    def add_account(self, event):
-        print("新增账号")
     
-    def jiance(self, event):
-        print("检测账号")
-    
-    def dellink(self, event):
-        print("清空链接")
-    
-    def daoru(self, event):
-        print("导入链接")
-    
-    def lunxun(self, event):
-        print("开启轮询")
-    
-    def nohead(self, event):
-        print("开启无头模式")
-    
-    def dianzan(self, event):
-        print("开始点赞")
 
-    def __style_config(self):
-        pass
+class Controller:
+    def __init__(self):
+        self.view = None
+
+    def init(self, view):
+        self.view = view
+
+    def addaccount(self, event):
+        print("Add Account button clicked")
+        # Your logic to add account
+
+    def jiance(self, event):
+        print("Check button clicked")
+        # Your logic to check accounts
+
+    def dellink(self, event):
+        print("Delete Link button clicked")
+        # Your logic to delete link
+
+    def daoru(self, event):
+        print("Import button clicked")
+        # Your logic to import links
+
+    def lunxun(self, event):
+        print("Polling checkbox toggled")
+        # Your logic for polling accounts
+
+    def nohead(self, event):
+        print("Headless mode checkbox toggled")
+        # Your logic to enable/disable headless mode
+
+    def dianzan(self, event):
+        print("Start Liking button clicked")
+        # Your logic to start liking process
 
 if __name__ == "__main__":
-    win = WinGUI()
+    import ttkbootstrap
+    controller = Controller()
+    win = Win(controller)
+    style = ttkbootstrap.Style(theme='darkly')
     win.mainloop()
