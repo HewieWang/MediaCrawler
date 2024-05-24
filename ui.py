@@ -1,6 +1,9 @@
-import random
+import random,os
 from tkinter import *
 from tkinter.ttk import *
+from tkinter import filedialog
+from playwright.sync_api import sync_playwright
+
 class WinGUI(Tk):
     def __init__(self):
         super().__init__()
@@ -213,6 +216,24 @@ class Controller:
     def addaccount(self, event):
         print("Add Account button clicked")
         # Your logic to add account
+        proxy_enabled = self.view.tk_check_button_lweor6yu.instate(['selected'])
+        proxy_address = self.view.tk_input_lweoshw6.get()
+        headless_mode = self.view.tk_check_button_lweomgi5.instate(['selected'])
+        continue_polling = self.view.tk_check_button_lweojus4.instate(['selected'])
+        save_login = self.view.tk_check_button_lweoxfwy.instate(['selected'])
+
+        log_message = (
+            f"是否开启代理: {proxy_enabled}\n"
+            f"代理地址: {proxy_address}\n"
+            f"开启无头模式: {headless_mode}\n"
+            f"点赞完毕继续下一个帐号轮询: {continue_polling}\n"
+            f"保存登录状态: {save_login}\n"
+            "------------------------\n"
+        )
+        
+        self.view.tk_text_lweoy6d5.insert(END, log_message)
+        #登录
+        login_xhs()
 
     def jiance(self, event):
         print("Check button clicked")
@@ -221,10 +242,12 @@ class Controller:
     def dellink(self, event):
         print("Delete Link button clicked")
         # Your logic to delete link
+        self.view.tk_table_lwemsjl4.delete(*self.view.tk_table_lwemsjl4.get_children())
 
     def daoru(self, event):
         print("Import button clicked")
         # Your logic to import links
+        self.import_links()
 
     def lunxun(self, event):
         print("Polling checkbox toggled")
@@ -237,6 +260,68 @@ class Controller:
     def dianzan(self, event):
         print("Start Liking button clicked")
         # Your logic to start liking process
+
+    def import_links(self):
+        file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
+        if file_path:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                links = file.readlines()
+            
+            self.view.tk_table_lwemsjl4.delete(*self.view.tk_table_lwemsjl4.get_children())  # Clear existing data
+            
+            for index, link in enumerate(links, start=1):
+                link = link.strip()
+                self.view.tk_table_lwemsjl4.insert("", "end", values=(index, link, ""))
+
+def ensure_xiaohongshu_url(input_string):
+    if "http" not in input_string:
+        input_string = "https://www.xiaohongshu.com/explore/" + input_string
+    return input_string
+
+def login_xhs(headless=False,proxy=False,proxy_url=""):
+    # Launch the browser
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False)
+
+        if os.path.exists("auth/state.json"):
+            context = browser.new_context(storage_state="auth/state.json")
+            page = context.new_page()
+            pass
+        else:
+            # Create a new page
+            page = browser.new_page()
+
+        page.set_default_timeout(0)
+        # Add init script
+        page.context.add_init_script(path='C:/Users/Administrator/Desktop/stealth.min.js')
+
+        # Set proxy if needed
+        # Replace 'proxy_server' and 'proxy_port' with your proxy server details
+        # page.context.set_http_proxy('proxy_server:proxy_port')
+
+        # Open the page
+        page.goto('https://www.xiaohongshu.com/explore')
+        page.click(".login-btn")
+
+        # page.wait_for_selector(".user.side-bar-component .channel")
+
+        page.wait_for_timeout(10000)
+
+        print("登录成功")
+
+        # storage = page.context.storage_state(path="auth/state.json")
+
+        notes=[
+            "https://www.xiaohongshu.com/explore/664ab2bb00000000150137d6",
+            "https://www.xiaohongshu.com/explore/664da40c000000000c019638",
+            "https://www.xiaohongshu.com/explore/6636fa44000000001e034238"
+        ]
+
+        for n in notes:
+            page.goto(ensure_xiaohongshu_url(n))
+            page.click(".interactions.engage-bar .like-lottie")
+        pass   
+    pass
 
 if __name__ == "__main__":
     import ttkbootstrap
